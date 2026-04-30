@@ -9,12 +9,14 @@ export function SiteHeader() {
       >
         Lex EU
       </Link>
-      <Link
-        href="/chat"
-        className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-      >
-        Try the demo
-      </Link>
+      <nav className="flex items-center gap-5 text-sm font-medium text-muted-foreground">
+        <Link href="/about" className="transition-colors hover:text-primary">
+          About
+        </Link>
+        <Link href="/chat" className="transition-colors hover:text-primary">
+          Try the demo
+        </Link>
+      </nav>
     </header>
   );
 }
