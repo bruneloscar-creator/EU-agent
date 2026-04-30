@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 
 type Mode = "Pro" | "Explainer";
 
+type ExampleQuestion = (typeof exampleQuestions)[number];
+
 type ToolEvent = {
   id: string;
   query: string;
@@ -471,6 +473,11 @@ export function ChatShell() {
     setSelectedCitation(null);
   }
 
+  function submitExample(question: ExampleQuestion) {
+    setMode(question.mode);
+    void submitMessage(undefined, question.text);
+  }
+
   return (
     <main className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur">
@@ -519,22 +526,24 @@ export function ChatShell() {
 
       <section className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 pb-44 pt-10 sm:px-8">
         {messages.length === 0 ? (
-          <div className="m-auto flex w-full max-w-2xl flex-col items-center text-center">
+          <div className="m-auto flex w-full max-w-4xl flex-col items-center text-center">
             <p className="font-serif text-3xl font-semibold text-foreground sm:text-4xl">
               Ask anything about EU legislation.
             </p>
-            <div className="mt-8 grid w-full gap-3">
+            <div className="mt-8 grid w-full gap-3 md:grid-cols-2">
               {exampleQuestions.map((question) => (
                 <button
                   key={question.text}
                   type="button"
-                  onClick={() => setInput(question.text)}
-                  className="rounded-lg border border-border bg-background p-4 text-left transition duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lift"
+                  onClick={() => submitExample(question)}
+                  disabled={isStreaming}
+                  className="block min-h-32 w-full rounded-lg border border-border bg-background p-4 text-left transition duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lift disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-                    {question.mode}
+                  <span className="flex items-center justify-between gap-3 font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+                    <span>{question.domain}</span>
+                    <span>{question.mode}</span>
                   </span>
-                  <span className="mt-2 block text-sm leading-6 text-foreground sm:text-base">
+                  <span className="mt-3 block text-sm leading-6 text-foreground sm:text-base">
                     {question.text}
                   </span>
                 </button>

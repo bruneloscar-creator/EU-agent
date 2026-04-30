@@ -1,15 +1,33 @@
 export const exampleQuestions = [
   {
     text: "What does the AI Act consider a high-risk system?",
-    mode: "Explainer"
+    mode: "Explainer",
+    domain: "AI & data"
   },
   {
     text: "Compare GDPR Article 6 with the Data Act's access rules.",
-    mode: "Pro"
+    mode: "Pro",
+    domain: "AI & data"
   },
   {
-    text: "What does the Chips Act actually fund?",
-    mode: "Explainer"
+    text: "What does the Chips Act fund, and how is it structured?",
+    mode: "Explainer",
+    domain: "Industrial & strategic"
+  },
+  {
+    text: "What does the Draghi Report recommend on EU competitiveness?",
+    mode: "Explainer",
+    domain: "Industrial & strategic"
+  },
+  {
+    text: "How does CBAM interact with the Emissions Trading System?",
+    mode: "Pro",
+    domain: "Finance & climate"
+  },
+  {
+    text: "What are MiCA's reserve requirements for stablecoins?",
+    mode: "Pro",
+    domain: "Finance & climate"
   }
 ] as const;
 
