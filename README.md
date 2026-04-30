@@ -58,9 +58,9 @@ Lex EU compresses that work to a conversation, with primary-source citations.
 
 ## Stack
 
-Next.js 14 · TypeScript · Tailwind · shadcn/ui · BGE embeddings via Transformers.js · sqlite-vec · better-sqlite3 · Vercel
+Next.js 14 · TypeScript · Tailwind · shadcn/ui · BGE embeddings via Transformers.js · sqlite-vec · better-sqlite3 · Claude Sonnet 4.5 (Anthropic) · Vercel
 
-Lex EU runs retrieval entirely on-device: embeddings via BGE running in Node, vector search via SQLite. The only paid dependency is Claude (Anthropic) for answer generation, which is wired on Day 3.
+Lex EU runs retrieval entirely on-device: embeddings via BGE running in Node, vector search via SQLite. The only paid dependency is Claude (Anthropic) for streamed answer generation.
 
 ## How it works
 
@@ -71,7 +71,7 @@ EU source texts -> article-aware chunking + metadata -> local BGE embeddings -> 
       user question -> retrieval -> grounded prompt -> Claude Sonnet 4 -> cited answer
 ```
 
-Day 2 ships the local retrieval path. The LLM answer generation path is intentionally stubbed until Day 3.
+Day 3 wires Claude to the local search tool. The agent streams answers, searches the local corpus before answering, and renders clickable citations back to indexed passages.
 
 ## Ingestion and search
 
@@ -105,7 +105,12 @@ Open `http://localhost:3000`.
 
 ## Environment
 
-Day 2 retrieval needs no environment variables and no API keys. `.env.example` is intentionally empty except for a note.
+Retrieval, ingestion, and CLI search run locally with no API keys. Streamed agent answers require Anthropic:
+
+```bash
+cp .env.example .env.local
+# then set ANTHROPIC_API_KEY in .env.local
+```
 
 Never commit real secrets.
 
@@ -125,7 +130,7 @@ npm run build
 
 ## Status
 
-Day 2 of a 5-day build sprint. Local ingestion and retrieval are working. [TODO: update each day]
+Day 3 of a 5-day build sprint. Local ingestion/retrieval are working; the chat agent is wired to Claude with local search tool use and clickable citations. [TODO: update each day]
 
 ## License
 

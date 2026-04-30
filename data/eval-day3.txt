@@ -1,0 +1,42 @@
+Lex EU Day 3 validation — 2026-04-30 10:00 CEST
+
+Live model validation status: BLOCKED.
+
+Reason:
+- `.env.local` is not present in this workspace.
+- `ANTHROPIC_API_KEY` is therefore unavailable at runtime.
+- `/api/chat` correctly returns HTTP 500 with:
+  "ANTHROPIC_API_KEY is missing. Add it to .env.local to enable streamed agent answers."
+
+Required UI validation queries:
+1. "What does the AI Act consider a high-risk AI system?" (Explainer)
+   Result: blocked by missing Anthropic API key.
+
+2. "How does the DMA define a gatekeeper, and what quantitative thresholds apply?" (Pro)
+   Result: blocked by missing Anthropic API key.
+
+3. "I'm a US founder building an AI coding tool. Do I need to worry about the EU AI Act?" (Explainer)
+   Result: blocked by missing Anthropic API key.
+
+4. "Compare GDPR Article 6 lawful bases with the Data Act's data access rules." (Pro, multi-turn follow-up)
+   Result: blocked by missing Anthropic API key.
+
+5. "What does the Draghi Report recommend on AI infrastructure?"
+   Result: blocked by missing Anthropic API key.
+
+Non-LLM checks actually run:
+- `npm install` completed successfully. npm reported 9 audit advisories inherited from dependencies.
+- `npm run build` passed.
+- `npm run search "AI Act high-risk systems"` returned AI Act Article 9 first and Article 6 second.
+- `GET /api/health` returned status ok.
+- `GET /api/search?q=high-risk+AI+system` returned AI Act Article 6 as the top result.
+- `GET /api/chunk?doc=AI%20Act&ref=Art.%206` resolved to `32024R1689_article_6`.
+- `POST /api/chat` without `ANTHROPIC_API_KEY` returned the intended clear 500 error instead of crashing.
+- Restarted a stale Next dev server and confirmed `/` and `/chat` both serve HTTP 200.
+
+Citation resolution spot-check:
+- `[AI Act, Art. 6]` resolves to the stored AI Act Article 6 chunk.
+
+Honest assessment:
+- The retrieval/citation substrate is ready for Day 3 agent validation.
+- The actual Claude answer quality, tool-call behavior, streaming cadence, mode differentiation, and citation fabrication rate could not be measured without the Anthropic key.
