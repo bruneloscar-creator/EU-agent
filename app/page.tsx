@@ -33,22 +33,23 @@ export default function Home() {
       <section className="mx-auto flex w-full max-w-6xl flex-col px-5 pb-14 pt-10 sm:px-8 sm:pb-20 sm:pt-16">
         <div className="max-w-4xl">
           <p className="mb-5 font-mono text-xs uppercase tracking-[0.22em] text-primary">
-            Primary-source EU regulation
+            AI agent for primary-source EU law
           </p>
           <h1 className="max-w-4xl font-serif text-5xl font-semibold leading-[0.96] tracking-normal text-foreground sm:text-7xl lg:text-8xl">
-            Talk to European legislation.
+            Ask EU legislation. Verify the source.
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
-            An AI agent for navigating EU regulation &mdash; from the AI Act to
-            the Chips Act. Answers grounded in primary sources, with citations
-            to specific articles.
+            Lex EU answers questions about 20 indexed EU regulations,
+            directives, and strategic reports. It searches the primary texts
+            first, then gives cited answers you can click back to the article.
           </p>
           <div className="mt-9 flex flex-col items-start gap-3">
             <Button asChild size="lg" className="h-12 rounded-md px-6">
-              <Link href="/chat">Try a demo question &rarr;</Link>
+              <Link href="/chat">Try it &rarr;</Link>
             </Button>
             <p className="text-sm text-muted-foreground">
-              No login. 20 EU texts indexed.
+              No login. AI Act, GDPR, DSA, DMA, Chips Act, CBAM, MiCA,
+              Draghi Report, and more.
             </p>
           </div>
         </div>
@@ -90,7 +91,12 @@ export default function Home() {
       </section>
 
       <footer className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-5 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-8">
-        <span>Built in 5 days.</span>
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
+          <span>Built in 5 days.</span>
+          <Link href="/about" className="font-medium transition-colors hover:text-primary">
+            About
+          </Link>
+        </div>
         <a
           href="https://github.com/[username]/lex-eu"
           className="inline-flex items-center gap-2 font-medium transition-colors hover:text-primary"
