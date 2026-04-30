@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { exampleQuestions } from "@/lib/content";
+import type { SearchResult } from "@/lib/retrieval/types";
 
 type Mode = "Pro" | "Explainer";
 
@@ -20,8 +21,11 @@ export function ChatShell() {
   const [mode, setMode] = useState<Mode>("Explainer");
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [sources, setSources] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
-  function submitMessage(event?: FormEvent<HTMLFormElement>) {
+  async function submitMessage(event?: FormEvent<HTMLFormElement>) {
     event?.preventDefault();
     const trimmed = input.trim();
 
@@ -29,21 +33,50 @@ export function ChatShell() {
       return;
     }
 
-    setMessages((current) => [
-      ...current,
-      { role: "user", content: trimmed },
-      {
-        role: "assistant",
-        content: `The agent will be wired up on Day 3. For now, here's an echo: ${trimmed}`
-      }
-    ]);
+    setMessages((current) => [...current, { role: "user", content: trimmed }]);
     setInput("");
+    setIsSearching(true);
+    setSearchError(null);
+
+    try {
+      const response = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}`);
+      if (!response.ok) {
+        throw new Error(`Search failed with HTTP ${response.status}`);
+      }
+      const payload = (await response.json()) as { results: SearchResult[] };
+      setSources(payload.results.slice(0, 3));
+      setMessages((current) => [
+        ...current,
+        {
+          role: "assistant",
+          content:
+            payload.results.length > 0
+              ? "Sources found. Answer generation is wired on Day 3."
+              : "No local sources found yet. Run npm run ingest to build the local index."
+        }
+      ]);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Search failed";
+      setSearchError(message);
+      setSources([]);
+      setMessages((current) => [
+        ...current,
+        {
+          role: "assistant",
+          content: "Local retrieval is unavailable. Run npm run ingest, then try again."
+        }
+      ]);
+    } finally {
+      setIsSearching(false);
+    }
   }
 
   function resetConversation() {
     setMessages([]);
+    setSources([]);
     setInput("");
     setMode("Explainer");
+    setSearchError(null);
   }
 
   return (
@@ -133,6 +166,44 @@ export function ChatShell() {
                 </div>
               </div>
             ))}
+            {(isSearching || sources.length > 0 || searchError) && (
+              <div className="rounded-lg border border-border bg-secondary/45 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                    Sources found
+                  </p>
+                  {isSearching && (
+                    <span className="text-xs text-muted-foreground">Searching...</span>
+                  )}
+                </div>
+
+                {searchError ? (
+                  <p className="mt-3 text-sm text-muted-foreground">{searchError}</p>
+                ) : (
+                  <div className="mt-3 grid gap-3">
+                    {sources.map((source) => (
+                      <a
+                        key={source.chunk.id}
+                        href={source.chunk.source_url}
+                        className="rounded-md border border-border bg-background p-3 text-left transition-colors hover:border-primary/50"
+                      >
+                        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-primary">
+                          {source.chunk.doc_short_name} · {source.chunk.section_type}{" "}
+                          {source.chunk.section_number} · score{" "}
+                          {source.score.toFixed(3)}
+                        </span>
+                        <span className="mt-1 block text-sm font-medium text-foreground">
+                          {source.chunk.section_title ?? source.chunk.doc_full_title}
+                        </span>
+                        <span className="mt-1 line-clamp-2 block text-sm leading-6 text-muted-foreground">
+                          {source.chunk.text}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </section>
@@ -150,7 +221,7 @@ export function ChatShell() {
                 onKeyDown={(event) => {
                   if (event.key === "Enter" && !event.shiftKey) {
                     event.preventDefault();
-                    submitMessage();
+                    void submitMessage();
                   }
                 }}
                 placeholder="Ask about the AI Act, GDPR, DSA, Chips Act..."

@@ -2,9 +2,17 @@ import { Github } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { exampleQuestions, indexedTexts } from "@/lib/content";
+import { exampleQuestions } from "@/lib/content";
+import { sourceDocuments } from "@/lib/retrieval/documents";
+import { readManifest } from "@/lib/retrieval/manifest";
 
 export default function Home() {
+  const manifest = readManifest();
+  const indexedTexts =
+    manifest?.docs
+      .filter((doc) => doc.status === "indexed")
+      .map((doc) => doc.short_name) ?? sourceDocuments.map((doc) => doc.shortName);
+
   return (
     <main className="min-h-screen bg-background">
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-6 sm:px-8">
