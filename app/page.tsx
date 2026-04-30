@@ -98,13 +98,12 @@ export default function Home() {
           </Link>
         </div>
         <a
-          href="https://github.com/[username]/lex-eu"
+          href="https://github.com/bruneloscar-creator/EU-agent"
           className="inline-flex items-center gap-2 font-medium transition-colors hover:text-primary"
         >
           <Github className="h-4 w-4" aria-hidden="true" />
           Open source on GitHub &rarr;
         </a>
-        <span className="sr-only">TODO(oscar): fix the GitHub username.</span>
       </footer>
     </main>
   );
