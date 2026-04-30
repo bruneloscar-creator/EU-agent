@@ -205,6 +205,110 @@ export async function search(query: string, k = 8): Promise<SearchResult[]> {
   }
 }
 
+export function getChunkById(id: string): Chunk | null {
+  if (!fs.existsSync(DB_PATH)) {
+    return null;
+  }
+
+  const db = openLexDb(true);
+  try {
+    const row = db
+      .prepare("SELECT chunk_json FROM chunks WHERE id = ?")
+      .get(id) as { chunk_json: string } | undefined;
+    return row ? (JSON.parse(row.chunk_json) as Chunk) : null;
+  } finally {
+    db.close();
+  }
+}
+
+function parseCitationRef(ref: string) {
+  const normalized = ref.trim().replace(/\s+/g, " ");
+  const article = normalized.match(/^(?:Art\.|Article)\s+([0-9]+[a-z]?)/i);
+  if (article) {
+    return { sectionType: "article", sectionNumber: article[1] };
+  }
+
+  const annex = normalized.match(/^Annex\s+(.+)$/i);
+  if (annex) {
+    return { sectionType: "annex", sectionNumber: `Annex ${annex[1].trim()}` };
+  }
+
+  const recital = normalized.match(/^Recital\s+([0-9]+[a-z]?)/i);
+  if (recital) {
+    return { sectionType: "recital", sectionNumber: recital[1] };
+  }
+
+  const section = normalized.match(/^Section\s+(.+)$/i);
+  if (section) {
+    return { sectionType: "section", sectionNumber: section[1].trim() };
+  }
+
+  return null;
+}
+
+export async function findChunkByCitation(
+  docShortName: string,
+  ref: string
+): Promise<Chunk | null> {
+  if (!fs.existsSync(DB_PATH)) {
+    return null;
+  }
+
+  const parsed = parseCitationRef(ref);
+  const db = openLexDb(true);
+
+  try {
+    if (parsed) {
+      const exact = db
+        .prepare(
+          `SELECT chunk_json FROM chunks
+           WHERE lower(doc_short_name) = lower(?)
+             AND section_type = ?
+             AND section_number = ?
+           LIMIT 1`
+        )
+        .get(docShortName, parsed.sectionType, parsed.sectionNumber) as
+        | { chunk_json: string }
+        | undefined;
+
+      if (exact) {
+        return JSON.parse(exact.chunk_json) as Chunk;
+      }
+
+      const fuzzyNeedle =
+        parsed.sectionType === "annex"
+          ? parsed.sectionNumber.replace(/\s+/g, " ")
+          : `${parsed.sectionType === "article" ? "Article" : parsed.sectionType} ${
+              parsed.sectionNumber
+            }`;
+      const fuzzy = db
+        .prepare(
+          `SELECT chunk_json FROM chunks
+           WHERE lower(doc_short_name) = lower(?)
+             AND (section_number LIKE ? OR text LIKE ?)
+           LIMIT 1`
+        )
+        .get(docShortName, `%${fuzzyNeedle}%`, `%${fuzzyNeedle}%`) as
+        | { chunk_json: string }
+        | undefined;
+
+      if (fuzzy) {
+        return JSON.parse(fuzzy.chunk_json) as Chunk;
+      }
+    }
+  } finally {
+    db.close();
+  }
+
+  const fallback = await search(`${docShortName} ${ref}`, 8);
+  return (
+    fallback.find(
+      (result) =>
+        result.chunk.doc_short_name.toLowerCase() === docShortName.toLowerCase()
+    )?.chunk ?? null
+  );
+}
+
 export function getRandomChunk(): Chunk | null {
   if (!fs.existsSync(DB_PATH)) {
     return null;
