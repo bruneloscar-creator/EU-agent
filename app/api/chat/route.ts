@@ -17,7 +17,7 @@ type ClientMessage = {
 };
 
 const MODEL = "claude-sonnet-4-5";
-const MAX_TOOL_CALLS = 5;
+const MAX_TOOL_CALLS = 8;
 
 function sse(event: string, data: unknown) {
   return `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
@@ -179,7 +179,7 @@ export async function POST(request: Request) {
           for (const toolUse of toolUses) {
             if (toolCallCount >= MAX_TOOL_CALLS) {
               throw new Error(
-                "Tool call limit reached. Please narrow the question and try again."
+                "I needed to dig further than I expected for this question. Try breaking it into a more focused query — for example, ask about one regulation at a time, or one specific provision."
               );
             }
 
