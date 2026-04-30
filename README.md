@@ -26,8 +26,6 @@ Lex EU compresses that work to a conversation, with primary-source citations.
 - Data Governance Act
 - Cyber Resilience Act
 - NIS2 Directive
-- eIDAS 2.0
-- European Media Freedom Act
 
 **Industrial**
 
@@ -37,9 +35,9 @@ Lex EU compresses that work to a conversation, with primary-source citations.
 
 **Green**
 
-- Corporate Sustainability Reporting Directive
-- Corporate Sustainability Due Diligence Directive
-- EU Taxonomy Regulation
+- European Climate Law
+- CSRD
+- CBAM
 
 **Finance**
 
@@ -49,7 +47,9 @@ Lex EU compresses that work to a conversation, with primary-source citations.
 **Strategic documents**
 
 - Draghi Report
-- EU Competitiveness Compass
+- Letta Report
+- AI Continent Action Plan
+- Commission Work Programme 2026
 
 ## Two modes
 
@@ -58,18 +58,41 @@ Lex EU compresses that work to a conversation, with primary-source citations.
 
 ## Stack
 
-Next.js 14 · TypeScript · Tailwind · shadcn/ui · Claude Sonnet 4 (Anthropic) · Voyage embeddings · Turbopuffer · Vercel
+Next.js 14 · TypeScript · Tailwind · shadcn/ui · BGE embeddings via Transformers.js · sqlite-vec · better-sqlite3 · Vercel
+
+Lex EU runs retrieval entirely on-device: embeddings via BGE running in Node, vector search via SQLite. The only paid dependency is Claude (Anthropic) for answer generation, which is wired on Day 3.
 
 ## How it works
 
 V0 will use a retrieval-augmented generation flow:
 
 ```text
-EU source texts -> chunking + metadata -> Voyage embeddings -> Turbopuffer index
+EU source texts -> article-aware chunking + metadata -> local BGE embeddings -> sqlite-vec
       user question -> retrieval -> grounded prompt -> Claude Sonnet 4 -> cited answer
 ```
 
-Day 1 ships the public UI, chat shell, environment contract, and health endpoint. The LLM and retrieval path are intentionally stubbed until API keys and source ingestion are added.
+Day 2 ships the local retrieval path. The LLM answer generation path is intentionally stubbed until Day 3.
+
+## Ingestion and search
+
+Build the local index:
+
+```bash
+npm run ingest
+```
+
+Search from the CLI:
+
+```bash
+npm run search "high-risk AI system"
+```
+
+Use the API from a running app:
+
+```bash
+GET /api/search?q=high-risk+AI+system
+GET /api/docs
+```
 
 ## Local development
 
@@ -82,14 +105,7 @@ Open `http://localhost:3000`.
 
 ## Environment
 
-Copy `.env.example` to `.env.local` when wiring the agent:
-
-```bash
-ANTHROPIC_API_KEY=replace_me
-VOYAGE_API_KEY=replace_me
-TURBOPUFFER_API_KEY=replace_me
-DATABASE_URL=postgresql://user:password@host:5432/lex_eu
-```
+Day 2 retrieval needs no environment variables and no API keys. `.env.example` is intentionally empty except for a note.
 
 Never commit real secrets.
 
@@ -109,7 +125,7 @@ npm run build
 
 ## Status
 
-Day 1 of a 5-day build sprint. [TODO: update each day]
+Day 2 of a 5-day build sprint. Local ingestion and retrieval are working. [TODO: update each day]
 
 ## License
 
