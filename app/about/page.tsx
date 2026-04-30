@@ -9,19 +9,22 @@ export default function AboutPage() {
           About
         </p>
         <h1 className="font-serif text-5xl font-semibold leading-tight text-foreground">
-          Lex EU turns dense regulation into cited answers.
+          What is Lex EU?
         </h1>
         <div className="mt-8 space-y-6 text-lg leading-8 text-muted-foreground">
           <p>
-            EU law is public, but it is rarely easy to work with. Important
-            obligations are spread across articles, annexes, recitals, delegated
-            acts, and strategic reports that are difficult to compare quickly.
+            Lex EU is an AI agent that lets you ask questions about European
+            Union legislation in natural language. Answers are grounded in
+            primary source documents &mdash; the actual regulations, directives,
+            and strategic reports &mdash; with citations to specific articles you
+            can click to verify.
           </p>
           <p>
-            Lex EU is being built as a focused research agent for European
-            legislation. The goal is simple: ask a natural-language question,
-            choose Pro or Explainer mode, and get an answer grounded in primary
-            source text with specific citations.
+            20 texts spanning EU digital law (AI Act, GDPR, DSA, DMA, Data Act,
+            Cyber Resilience Act, NIS2), industrial policy (Chips Act, Critical
+            Raw Materials Act, Net-Zero Industry Act), climate (CSRD, CBAM,
+            Climate Law), finance (MiCA, DORA), and strategic documents (Draghi
+            Report, Letta Report). Built in 5 days as a sprint project.
           </p>
         </div>
       </section>

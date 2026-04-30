@@ -2,7 +2,7 @@
 
 **Talk to European legislation.** An AI agent for navigating EU regulation, from the AI Act to the Chips Act. Answers grounded in primary sources, with citations.
 
--> Live demo: [TODO: paste Vercel URL after deploy]
+-> Live demo: https://eu-agents.vercel.app
 
 <div style="aspect-ratio: 16 / 9; border: 1px solid #d6d0c4; background: #fbfaf7; display: flex; align-items: center; justify-content: center; color: #6b6b6b; font-family: sans-serif;">
   TODO: add product screenshot after the first deploy
