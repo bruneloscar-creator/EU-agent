@@ -1,11 +1,29 @@
 import fs from "node:fs";
+import { createRequire } from "node:module";
 
 import Database from "better-sqlite3";
-import * as sqliteVec from "sqlite-vec";
 
 import { DB_PATH } from "./paths";
 import type { Chunk, SearchResult } from "./types";
 import { embedQuery, EMBEDDING_DIMENSIONS } from "./bge";
+
+const require = createRequire(import.meta.url);
+
+function loadSqliteVec(db: Database.Database, required = false) {
+  try {
+    const sqliteVec = require("sqlite-vec") as {
+      load: (database: Database.Database) => void;
+    };
+    sqliteVec.load(db);
+    return true;
+  } catch (error) {
+    if (required) {
+      throw error;
+    }
+    console.warn("[search] sqlite-vec unavailable; using SQLite FTS only", error);
+    return false;
+  }
+}
 
 function vectorToBlob(vector: Float32Array) {
   return Buffer.from(vector.buffer, vector.byteOffset, vector.byteLength);
@@ -13,7 +31,7 @@ function vectorToBlob(vector: Float32Array) {
 
 export function openLexDb(readonly = false) {
   const db = new Database(DB_PATH, { readonly, fileMustExist: readonly });
-  sqliteVec.load(db);
+  loadSqliteVec(db, !readonly);
   return db;
 }
 
