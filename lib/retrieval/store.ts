@@ -129,16 +129,6 @@ export async function search(query: string, k = 8): Promise<SearchResult[]> {
 
   const db = openLexDb(true);
   try {
-    const queryVector = await embedQuery(trimmed);
-    const vectorRows = db
-      .prepare(
-        "SELECT rowid, distance FROM vec_chunks WHERE embedding MATCH ? AND k = ?"
-      )
-      .all(vectorToBlob(queryVector), Math.max(k, 30)) as Array<{
-      rowid: number;
-      distance: number;
-    }>;
-
     const chunkByRowid = db.prepare(
       "SELECT chunk_json FROM chunks WHERE rowid = ?"
     );
@@ -147,14 +137,6 @@ export async function search(query: string, k = 8): Promise<SearchResult[]> {
       number,
       { rowid: number; score: number; distance?: number }
     >();
-
-    vectorRows.forEach((row) => {
-      merged.set(row.rowid, {
-        rowid: row.rowid,
-        distance: row.distance,
-        score: 1 / (1 + row.distance)
-      });
-    });
 
     const ftsQuery = trimmed
       .toLowerCase()
@@ -177,13 +159,39 @@ export async function search(query: string, k = 8): Promise<SearchResult[]> {
 
       ftsRows.forEach((row, index) => {
         const existing = merged.get(row.rowid);
-        const lexicalBoost = 0.025 * ((ftsRows.length - index) / ftsRows.length);
+        const lexicalBoost = 0.55 + 0.2 * ((ftsRows.length - index) / ftsRows.length);
         merged.set(row.rowid, {
           rowid: row.rowid,
           distance: existing?.distance,
           score: (existing?.score ?? 0.45) + lexicalBoost
         });
       });
+    }
+
+    try {
+      const queryVector = await embedQuery(trimmed);
+      const vectorRows = db
+        .prepare(
+          "SELECT rowid, distance FROM vec_chunks WHERE embedding MATCH ? AND k = ?"
+        )
+        .all(vectorToBlob(queryVector), Math.max(k, 30)) as Array<{
+        rowid: number;
+        distance: number;
+      }>;
+
+      vectorRows.forEach((row) => {
+        const existing = merged.get(row.rowid);
+        merged.set(row.rowid, {
+          rowid: row.rowid,
+          distance: row.distance,
+          score: (existing?.score ?? 0) + 1 / (1 + row.distance)
+        });
+      });
+    } catch (error) {
+      console.warn(
+        "[search] vector search failed; falling back to SQLite FTS",
+        error
+      );
     }
 
     return Array.from(merged.values())
