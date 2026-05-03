@@ -1,0 +1,3 @@
+data/lex-eu.db binary
+data/lex-eu.db linguist-generated=true
+data/models/** linguist-vendored=true

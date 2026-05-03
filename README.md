@@ -1,22 +1,30 @@
 # Lex EU
 
-**Talk to European legislation.** A research interface for navigating EU regulation, from the AI Act to the Chips Act. Answers are grounded in primary sources, with citations.
+**Talk to European legislation.** Lex EU is a source-first research interface for European Union regulation, from the AI Act to the Chips Act. It answers natural-language questions with citations to the underlying primary texts.
 
--> Live demo: https://eu-agents.vercel.app
+Live demo: [https://eu-agents.vercel.app](https://eu-agents.vercel.app)
 
-<div style="aspect-ratio: 16 / 9; border: 1px solid #d6d0c4; background: #fbfaf7; display: flex; align-items: center; justify-content: center; color: #6b6b6b; font-family: sans-serif;">
-  TODO: add product screenshot after the first deploy
-</div>
+Built by **Oscar Brunel**.
 
-## Why
+## Why This Exists
 
-EU legislation is dense, fragmented, and constantly evolving. Today, understanding what the AI Act says about high-risk systems means downloading a 200-page PDF from EUR-Lex, reading article by article, and cross-referencing with the Annexes. Across law firms, regtech startups, NGOs, and journalists, hundreds of hours per week are spent on retrieval that should take 30 seconds.
+EU legislation is dense, fragmented, and difficult to navigate quickly. A practical question like “what counts as a high-risk system under the AI Act?” can mean opening EUR-Lex, finding the right regulation, reading Article 6, checking Annex III, and then following related obligations across the text.
 
-Lex EU compresses that work into a source-first research flow, with primary-source citations.
+Lex EU compresses that workflow into a verifiable research loop: ask a question, retrieve the relevant source passages, read a cited answer, and click back to the exact provision.
 
-## What's indexed (V0)
+## What It Does
 
-**Tech & digital**
+- Searches a curated corpus of 20 EU legal and policy texts.
+- Retrieves article-aware chunks rather than arbitrary text snippets.
+- Streams answers with inline citations such as `[AI Act, Art. 6]`.
+- Opens cited passages in a source panel for verification.
+- Supports two response modes:
+  - **Pro**: terse, technical, citation-heavy.
+  - **Explainer**: plain-English, contextual, accessible.
+
+## Indexed Corpus
+
+**Tech and digital**
 
 - AI Act
 - GDPR
@@ -27,19 +35,19 @@ Lex EU compresses that work into a source-first research flow, with primary-sour
 - Cyber Resilience Act
 - NIS2 Directive
 
-**Industrial**
+**Industrial policy**
 
 - European Chips Act
 - Critical Raw Materials Act
 - Net-Zero Industry Act
 
-**Green**
+**Climate and sustainability**
 
 - European Climate Law
 - CSRD
 - CBAM
 
-**Finance**
+**Finance and markets**
 
 - Markets in Crypto-Assets Regulation
 - DORA
@@ -51,86 +59,101 @@ Lex EU compresses that work into a source-first research flow, with primary-sour
 - AI Continent Action Plan
 - Commission Work Programme 2026
 
-## Two modes
-
-- **Pro** - terse, technical, citation-heavy. For lawyers, public affairs, regtech.
-- **Explainer** - plain-English, more context. For students, journalists, founders.
-
-## Stack
-
-Next.js 14 · TypeScript · Tailwind · shadcn/ui · local embeddings · sqlite-vec · better-sqlite3 · Vercel
-
-Lex EU runs retrieval locally: source texts are chunked with citation metadata, embedded, and searched through SQLite-backed vector retrieval.
-
-## How it works
-
-V0 uses a source-first retrieval flow:
+## Architecture
 
 ```text
-EU source texts -> article-aware chunking + metadata -> local BGE embeddings -> sqlite-vec
-      user question -> retrieval -> cited answer with source passages
+EUR-Lex / official PDFs
+        |
+        v
+fetch + clean source text
+        |
+        v
+article-aware chunking with citation metadata
+        |
+        v
+local SQLite index + full-text fallback
+        |
+        v
+retrieval tool used by the chat route
+        |
+        v
+streamed answer with clickable source citations
 ```
 
-The product searches the local corpus before answering and renders clickable citations back to indexed passages.
+The repository includes a generated local SQLite index so the deployed demo can retrieve sources without a hosted vector database. The ingestion pipeline can regenerate that index from public sources.
 
-## Ingestion and search
+See [CHUNKING.md](./CHUNKING.md) for the chunking strategy.
 
-Build the local index:
+## Tech Stack
 
-```bash
-npm run ingest
-```
+- Next.js 14 App Router
+- TypeScript
+- Tailwind CSS
+- shadcn/ui-style primitives
+- better-sqlite3
+- sqlite-vec for local vector indexing during ingestion
+- SQLite FTS fallback for production-safe retrieval
+- Anthropic API for streamed answer generation
+- Vercel
 
-Search from the CLI:
-
-```bash
-npm run search "high-risk AI system"
-```
-
-Use the API from a running app:
-
-```bash
-GET /api/search?q=high-risk+AI+system
-GET /api/docs
-```
-
-## Local development
+## Try It Locally
 
 ```bash
 npm install
+cp .env.example .env.local
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Then open [http://localhost:3000](http://localhost:3000).
 
-## Environment
+`ANTHROPIC_API_KEY` is required for streamed chat answers. The retrieval APIs and CLI search can run locally from the committed index.
 
-Retrieval, ingestion, and CLI search run locally with no API keys. Streamed answers require the production language model key:
+## Useful Commands
 
-```bash
-cp .env.example .env.local
-# then set ANTHROPIC_API_KEY in .env.local
-```
-
-Never commit real secrets.
-
-## Deploy
-
-Deploy on Vercel after setting the production environment variables. No custom `vercel.json` is required for the current Next.js app.
+Run a production build:
 
 ```bash
 npm run build
 ```
 
-## Roadmap
+Search the local corpus from the CLI:
 
-**V0** - 20 indexed texts, conversational answers with citations, dual-mode, "compare two provisions" feature.
+```bash
+npm run search "What does the AI Act consider a high-risk system?"
+```
 
-**V1** - French / German support, CJEU case law, real-time tracking of legislative proposals, national transpositions.
+Regenerate the local index:
 
-## Status
+```bash
+npm run ingest
+```
 
-Local ingestion/retrieval are working; chat answers use local search and clickable citations. [TODO: update each day]
+Inspect the retrieval API from a running app:
+
+```bash
+curl "http://localhost:3000/api/search?q=high-risk+AI+system"
+curl "http://localhost:3000/api/docs"
+```
+
+## API Routes
+
+- `GET /api/health` - service health check
+- `GET /api/docs` - indexed corpus manifest
+- `GET /api/search?q=...` - retrieval results with chunk metadata
+- `GET /api/chunk?doc=...&ref=...` - source lookup for citations
+- `POST /api/chat` - streamed chat response
+
+## Example Questions
+
+- What does the AI Act consider a high-risk system?
+- Compare GDPR Article 6 with the Data Act's access rules.
+- What does the Chips Act fund, and how is it structured?
+- How does CBAM interact with the Emissions Trading System?
+- What are MiCA's reserve requirements for stablecoins?
+
+## Project Status
+
+Lex EU is a working prototype: ingestion, local retrieval, citation lookup, streamed answers, and the public demo are live. The next step is improving retrieval ranking and expanding citation coverage for annex-heavy provisions.
 
 ## License
 

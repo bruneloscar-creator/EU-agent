@@ -20,14 +20,12 @@ export async function GET(request: Request) {
       ms: Math.round(performance.now() - started)
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown search error.";
     console.error("[api/search] failed", error);
     return Response.json(
       {
         query,
         results: [],
-        error: `Search is temporarily unavailable: ${message}`,
+        error: "Search is temporarily unavailable. Please try again in a moment.",
         ms: Math.round(performance.now() - started)
       },
       { status: 500 }

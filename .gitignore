@@ -13,3 +13,5 @@ yarn-error.log*
 pnpm-debug.log*
 *.tsbuildinfo
 .DS_Store
+WAKEUP.md
+data/eval-*.txt

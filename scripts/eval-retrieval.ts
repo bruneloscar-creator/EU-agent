@@ -24,7 +24,7 @@ function excerpt(text: string) {
 
 async function main() {
   const lines: string[] = [];
-  lines.push(`# Lex EU Day 2 retrieval eval`);
+  lines.push(`# Lex EU retrieval eval`);
   lines.push(`Generated: ${new Date().toISOString()}`);
 
   for (let index = 0; index < queries.length; index += 1) {

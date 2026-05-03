@@ -8,7 +8,7 @@
     "start": "next start",
     "ingest": "tsx scripts/ingest.ts",
     "search": "tsx scripts/search.ts",
-    "eval:retrieval": "tsx scripts/eval-day2.ts",
+    "eval:retrieval": "tsx scripts/eval-retrieval.ts",
     "lint": "next lint"
   },
   "dependencies": {
