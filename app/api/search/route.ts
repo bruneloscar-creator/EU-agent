@@ -12,10 +12,25 @@ export async function GET(request: Request) {
     return Response.json({ query, results: [], ms: 0 }, { status: 400 });
   }
 
-  const results = await search(query, 8);
-  return Response.json({
-    query,
-    results,
-    ms: Math.round(performance.now() - started)
-  });
+  try {
+    const results = await search(query, 8);
+    return Response.json({
+      query,
+      results,
+      ms: Math.round(performance.now() - started)
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Unknown search error.";
+    console.error("[api/search] failed", error);
+    return Response.json(
+      {
+        query,
+        results: [],
+        error: `Search is temporarily unavailable: ${message}`,
+        ms: Math.round(performance.now() - started)
+      },
+      { status: 500 }
+    );
+  }
 }
