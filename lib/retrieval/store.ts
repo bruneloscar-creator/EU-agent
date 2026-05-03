@@ -31,7 +31,9 @@ function vectorToBlob(vector: Float32Array) {
 
 export function openLexDb(readonly = false) {
   const db = new Database(DB_PATH, { readonly, fileMustExist: readonly });
-  loadSqliteVec(db, !readonly);
+  if (!readonly) {
+    loadSqliteVec(db, true);
+  }
   return db;
 }
 
