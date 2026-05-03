@@ -23,7 +23,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Lex EU",
   description:
-    "An AI agent for navigating European Union legislation with grounded citations."
+    "A research interface for navigating European Union legislation with grounded citations."
 };
 
 export default function RootLayout({

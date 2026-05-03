@@ -35,16 +35,16 @@ export default function Home() {
       <section className="mx-auto flex w-full max-w-6xl flex-col px-5 pb-14 pt-10 sm:px-8 sm:pb-20 sm:pt-16">
         <div className="max-w-4xl">
           <p className="mb-5 font-mono text-xs uppercase tracking-[0.22em] text-primary">
-            Built by Oscar Brunel · AI agent for EU legislation
+            Primary-source EU legislation, searchable in plain English
           </p>
           <h1 className="max-w-4xl font-serif text-5xl font-semibold leading-[0.96] tracking-normal text-foreground sm:text-7xl lg:text-8xl">
-            Understand EU law with cited answers.
+            Talk to European legislation.
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
-            Lex EU is an AI research assistant for European Union legislation.
-            Ask a question in plain language; it searches 20 primary-source EU
-            texts, calls retrieval tools, and answers with clickable citations
-            to the relevant articles, annexes, or report sections.
+            Lex EU helps you navigate EU regulation from the AI Act to the Chips
+            Act. Ask a question in plain language and get answers grounded in 20
+            primary-source texts, with citations to the relevant articles,
+            annexes, and report sections.
           </p>
           <div className="mt-7 grid max-w-3xl gap-3 text-sm leading-6 text-muted-foreground sm:grid-cols-3">
             <div className="rounded-md border border-border bg-secondary/40 p-3">
@@ -63,7 +63,7 @@ export default function Home() {
             </Button>
             <p className="text-sm text-muted-foreground">
               No login. Built for policy professionals, professors, students,
-              and anyone who needs to verify what EU texts actually say.
+              and anyone who needs to verify the source quickly.
             </p>
           </div>
         </div>
@@ -106,7 +106,7 @@ export default function Home() {
 
       <footer className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-5 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-8">
         <div className="flex flex-wrap gap-x-4 gap-y-2">
-          <span>Built in 5 days.</span>
+          <span>Primary-source answers for EU legislation.</span>
           <Link href="/about" className="font-medium transition-colors hover:text-primary">
             About
           </Link>

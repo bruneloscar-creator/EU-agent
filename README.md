@@ -1,6 +1,6 @@
 # Lex EU
 
-**Talk to European legislation.** An AI agent for navigating EU regulation, from the AI Act to the Chips Act. Answers grounded in primary sources, with citations.
+**Talk to European legislation.** A research interface for navigating EU regulation, from the AI Act to the Chips Act. Answers are grounded in primary sources, with citations.
 
 -> Live demo: https://eu-agents.vercel.app
 
@@ -12,7 +12,7 @@
 
 EU legislation is dense, fragmented, and constantly evolving. Today, understanding what the AI Act says about high-risk systems means downloading a 200-page PDF from EUR-Lex, reading article by article, and cross-referencing with the Annexes. Across law firms, regtech startups, NGOs, and journalists, hundreds of hours per week are spent on retrieval that should take 30 seconds.
 
-Lex EU compresses that work to a conversation, with primary-source citations.
+Lex EU compresses that work into a source-first research flow, with primary-source citations.
 
 ## What's indexed (V0)
 
@@ -58,20 +58,20 @@ Lex EU compresses that work to a conversation, with primary-source citations.
 
 ## Stack
 
-Next.js 14 · TypeScript · Tailwind · shadcn/ui · BGE embeddings via Transformers.js · sqlite-vec · better-sqlite3 · Claude Sonnet 4.5 (Anthropic) · Vercel
+Next.js 14 · TypeScript · Tailwind · shadcn/ui · local embeddings · sqlite-vec · better-sqlite3 · Vercel
 
-Lex EU runs retrieval entirely on-device: embeddings via BGE running in Node, vector search via SQLite. The only paid dependency is Claude (Anthropic) for streamed answer generation.
+Lex EU runs retrieval locally: source texts are chunked with citation metadata, embedded, and searched through SQLite-backed vector retrieval.
 
 ## How it works
 
-V0 will use a retrieval-augmented generation flow:
+V0 uses a source-first retrieval flow:
 
 ```text
 EU source texts -> article-aware chunking + metadata -> local BGE embeddings -> sqlite-vec
-      user question -> retrieval -> grounded prompt -> Claude Sonnet 4 -> cited answer
+      user question -> retrieval -> cited answer with source passages
 ```
 
-Day 3 wires Claude to the local search tool. The agent streams answers, searches the local corpus before answering, and renders clickable citations back to indexed passages.
+The product searches the local corpus before answering and renders clickable citations back to indexed passages.
 
 ## Ingestion and search
 
@@ -105,7 +105,7 @@ Open `http://localhost:3000`.
 
 ## Environment
 
-Retrieval, ingestion, and CLI search run locally with no API keys. Streamed agent answers require Anthropic:
+Retrieval, ingestion, and CLI search run locally with no API keys. Streamed answers require the production language model key:
 
 ```bash
 cp .env.example .env.local
@@ -124,13 +124,13 @@ npm run build
 
 ## Roadmap
 
-**V0 (this week)** - 20 indexed texts, conversational agent with citations, dual-mode, "compare two provisions" feature.
+**V0** - 20 indexed texts, conversational answers with citations, dual-mode, "compare two provisions" feature.
 
 **V1** - French / German support, CJEU case law, real-time tracking of legislative proposals, national transpositions.
 
 ## Status
 
-Day 3 of a 5-day build sprint. Local ingestion/retrieval are working; the chat agent is wired to Claude with local search tool use and clickable citations. [TODO: update each day]
+Local ingestion/retrieval are working; chat answers use local search and clickable citations. [TODO: update each day]
 
 ## License
 
